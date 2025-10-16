@@ -8,6 +8,7 @@ const products = [
         category: "electronics",
         rating: 5,
         badge: "Хит продаж"
+        image: "Watchsfs.jpeg"
     },
     {
         id: 2,
@@ -17,6 +18,7 @@ const products = [
         category: "electronics",
         rating: 4,
         badge: null
+        image: "headphonesfs.webp"
     },
     {
         id: 3,
@@ -26,6 +28,7 @@ const products = [
         category: "clothing",
         rating: 5,
         badge: "Новинка"
+        image: "rukzak.jpg"
     },
     {
         id: 4,
@@ -35,6 +38,7 @@ const products = [
         category: "electronics",
         rating: 4,
         badge: null
+        image: "fitbrfs.jpg"
     },
     {
         id: 5,
@@ -44,6 +48,7 @@ const products = [
         category: "home",
         rating: 5,
         badge: null
+        image: "coffeemfs.webp"
     },
     {
         id: 6,
@@ -53,6 +58,7 @@ const products = [
         category: "electronics",
         rating: 4,
         badge: "Выбор редакции"
+        image: "ebookfs.jpg"
     }
 ];
 
@@ -542,3 +548,4 @@ const cartNotificationStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = cartNotificationStyles;
 document.head.appendChild(styleSheet);
+
