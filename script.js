@@ -1,4 +1,4 @@
-<script>
+
 // Данные товаров
 const products = [
     {
@@ -486,4 +486,3 @@ const cartNotificationStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = cartNotificationStyles;
 document.head.appendChild(styleSheet);
-</script>
