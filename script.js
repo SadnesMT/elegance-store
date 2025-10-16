@@ -7,7 +7,7 @@ const products = [
         price: 12990,
         category: "electronics",
         rating: 5,
-        badge: "Хит продаж"
+        badge: "Хит продаж",
         image: "Watchsfs.jpeg"
     },
     {
@@ -17,7 +17,7 @@ const products = [
         price: 8490,
         category: "electronics",
         rating: 4,
-        badge: null
+        badge: null,
         image: "headphonesfs.webp"
     },
     {
@@ -27,7 +27,7 @@ const products = [
         price: 5990,
         category: "clothing",
         rating: 5,
-        badge: "Новинка"
+        badge: "Новинка",
         image: "rukzak.jpg"
     },
     {
@@ -37,7 +37,7 @@ const products = [
         price: 3290,
         category: "electronics",
         rating: 4,
-        badge: null
+        badge: null,
         image: "fitbrfs.jpg"
     },
     {
@@ -47,7 +47,7 @@ const products = [
         price: 21990,
         category: "home",
         rating: 5,
-        badge: null
+        badge: null,
         image: "coffeemfs.webp"
     },
     {
@@ -57,7 +57,7 @@ const products = [
         price: 6790,
         category: "electronics",
         rating: 4,
-        badge: "Выбор редакции"
+        badge: "Выбор редакции",
         image: "ebookfs.jpg"
     }
 ];
@@ -411,7 +411,7 @@ function renderProducts(productsToRender) {
         productCard.className = 'product-card';
         productCard.innerHTML = `
             <div class="product-image">
-                <img src="${products.image}" alt="${product.name}">
+                <img src="${product.image}" alt="${product.name}">
                 ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
             </div>
             <div class="product-info">
@@ -548,6 +548,3 @@ const cartNotificationStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = cartNotificationStyles;
 document.head.appendChild(styleSheet);
-
-
-
