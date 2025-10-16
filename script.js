@@ -411,7 +411,7 @@ function renderProducts(productsToRender) {
         productCard.className = 'product-card';
         productCard.innerHTML = `
             <div class="product-image">
-                <img src="fonimg.jpg" alt="${product.name}">
+                <img src="${product.image}" alt="${product.name}">
                 ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
             </div>
             <div class="product-info">
@@ -548,4 +548,5 @@ const cartNotificationStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = cartNotificationStyles;
 document.head.appendChild(styleSheet);
+
 
