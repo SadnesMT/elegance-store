@@ -1,488 +1,1156 @@
-
-// Данные товаров
-const products = [
-    {
-        id: 1,
-        name: "Умные часы Premium",
-        description: "Смарт-часы с функцией отслеживания здоровья",
-        price: 12990,
-        category: "electronics",
-        rating: 5,
-        badge: "Хит продаж"
-    },
-    {
-        id: 2,
-        name: "Беспроводные наушники",
-        description: "Качество звука премиум-класса",
-        price: 8490,
-        category: "electronics",
-        rating: 4,
-        badge: null
-    },
-    {
-        id: 3,
-        name: "Кожаный рюкзак",
-        description: "Стильный и практичный аксессуар",
-        price: 5990,
-        category: "clothing",
-        rating: 5,
-        badge: "Новинка"
-    },
-    {
-        id: 4,
-        name: "Фитнес-браслет Pro",
-        description: "Отслеживание активности и сна",
-        price: 3290,
-        category: "electronics",
-        rating: 4,
-        badge: null
-    },
-    {
-        id: 5,
-        name: "Кофемашина Compact",
-        description: "Идеальный кофе каждое утро",
-        price: 21990,
-        category: "home",
-        rating: 5,
-        badge: null
-    },
-    {
-        id: 6,
-        name: "Электронная книга",
-        description: "Бережное для глаз чтение",
-        price: 6790,
-        category: "electronics",
-        rating: 4,
-        badge: "Выбор редакции"
-    }
-];
-
-// Корзина
-let cart = [];
-let contactsTriggerElement = null;
-
-// Слайдер
-let currentSlide = 0;
-const slides = document.querySelectorAll('.slide');
-const dots = document.querySelectorAll('.dot');
-const slideInterval = 6000;
-
-function showSlide(n) {
-    slides.forEach(slide => slide.classList.remove('active'));
-    dots.forEach(dot => dot.classList.remove('active'));
-    
-    currentSlide = (n + slides.length) % slides.length;
-    
-    slides[currentSlide].classList.add('active');
-    dots[currentSlide].classList.add('active');
+/* Базовые стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-function nextSlide() {
-    showSlide(currentSlide + 1);
+/* Удаление скроллбара */
+html {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
 }
 
-// Автопереключение слайдов
-let slideTimer = setInterval(nextSlide, slideInterval);
-
-// Обработчики для точек слайдера
-dots.forEach((dot, index) => {
-    dot.addEventListener('click', () => {
-        clearInterval(slideTimer);
-        showSlide(index);
-        slideTimer = setInterval(nextSlide, slideInterval);
-    });
-});
-
-// Шторка меню
-const menuBtn = document.getElementById('menuBtn');
-const sidebar = document.getElementById('sidebar');
-const closeSidebar = document.getElementById('closeSidebar');
-const overlay = document.getElementById('overlay');
-
-function toggleSidebar() {
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-    document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+html::-webkit-scrollbar {
+    display: none;
 }
 
-menuBtn.addEventListener('click', toggleSidebar);
-closeSidebar.addEventListener('click', toggleSidebar);
-overlay.addEventListener('click', toggleSidebar);
-
-// Корзина
-const cartBtn = document.getElementById('cartBtn');
-const cartSidebar = document.getElementById('cartSidebar');
-const closeCart = document.getElementById('closeCart');
-const cartItems = document.getElementById('cartItems');
-const cartTotal = document.getElementById('cartTotal');
-const cartCount = document.getElementById('cartCount');
-
-function toggleCart() {
-    cartSidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-    document.body.style.overflow = cartSidebar.classList.contains('active') ? 'hidden' : '';
+body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    transition: var(--transition);
 }
 
-function updateCart() {
-    // Обновляем счетчик корзины
-    cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
-    
-    // Обновляем содержимое корзины
-    cartItems.innerHTML = '';
-    
-    if (cart.length === 0) {
-        cartItems.innerHTML = '<div class="empty-cart">Корзина пуста</div>';
-        cartTotal.textContent = '0 ₽';
-        return;
-    }
-    
-    let total = 0;
-    
-    cart.forEach(item => {
-        const cartItem = document.createElement('div');
-        cartItem.className = 'cart-item';
-        cartItem.innerHTML = `
-            <div class="cart-item-info">
-                <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-price">${item.price.toLocaleString()} ₽ × ${item.quantity}</div>
-            </div>
-            <button class="cart-item-remove" data-id="${item.id}">✕</button>
-        `;
-        cartItems.appendChild(cartItem);
-        total += item.price * item.quantity;
-    });
-    
-    cartTotal.textContent = total.toLocaleString() + ' ₽';
-    
-    // Добавляем обработчики для кнопок удаления
-    document.querySelectorAll('.cart-item-remove').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt(e.target.dataset.id);
-            removeFromCart(id);
-        });
-    });
+body::-webkit-scrollbar {
+    display: none;
 }
 
-function addToCart(product) {
-    const existingItem = cart.find(item => item.id === product.id);
-    
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({
-            ...product,
-            quantity: 1
-        });
-    }
-    
-    updateCart();
-    showCartNotification(product.name);
+/* Светлая тема в зеленых тонах */
+:root {
+    --primary: #2ecc71;
+    --primary-dark: #27ae60;
+    --primary-light: #d5f4e6;
+    --secondary: #3498db;
+    --accent: #e74c3c;
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --bg-light: #cbf5ca;
+    --bg-white: #ffffff;
+    --bg-card: rgba(255, 255, 255, 0.95);
+    --gray: #bdc3c7;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
 }
 
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.id !== productId);
-    updateCart();
+/* Темная тема */
+[data-theme="dark"] {
+    --primary: #38b2ac;
+    --primary-dark: #319795;
+    --primary-light: #1a2526;
+    --secondary: #4299e1;
+    --accent: #fc8181;
+    --text-dark: #e2e8f0;
+    --text-light: #a0aec0;
+    --bg-light: #1a202c;
+    --bg-white: #2d3748;
+    --bg-card: rgba(45, 55, 72, 0.95);
+    --gray: #4a5568;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-function showCartNotification(productName) {
-    // Создаем уведомление
-    const notification = document.createElement('div');
-    notification.className = 'cart-notification';
-    notification.innerHTML = `
-        <span>${productName} добавлен в корзину!</span>
-    `;
-    document.body.appendChild(notification);
-    
-    // Показываем уведомление
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
-    
-    // Убираем уведомление через 3 секунды
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
+body {
+    color: var(--text-dark);
+    background: var(--bg-light);
+    min-height: 100vh;
 }
 
-cartBtn.addEventListener('click', toggleCart);
-closeCart.addEventListener('click', toggleCart);
-
-// Закрытие по ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        if (sidebar.classList.contains('active')) {
-            toggleSidebar();
-        }
-        if (cartSidebar.classList.contains('active')) {
-            toggleCart();
-        }
-    }
-});
-
-// Смена темы
-const themeToggles = document.querySelectorAll('.theme-checkbox');
-const currentTheme = localStorage.getItem('theme') || 'light';
-
-function setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-    
-    // Устанавливаем состояние переключателей
-    themeToggles.forEach(toggle => {
-        toggle.checked = theme === 'dark';
-    });
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-// Установка начальной темы
-setTheme(currentTheme);
-
-themeToggles.forEach(toggle => {
-    toggle.addEventListener('change', () => {
-        setTheme(toggle.checked ? 'dark' : 'light');
-    });
-});
-
-// Всплывающее окно контактов
-const contactsTriggers = document.querySelectorAll('.contacts-trigger');
-const contactsPopup = document.getElementById('contactsPopup');
-let contactsTimer;
-
-function updateContactsPopupPosition() {
-    if (!contactsTriggerElement || !contactsPopup.classList.contains('show')) return;
-    
-    const rect = contactsTriggerElement.getBoundingClientRect();
-    contactsPopup.style.left = rect.left + 'px';
-    contactsPopup.style.top = rect.bottom + window.scrollY + 'px';
+/* Переключатель темы */
+.theme-toggle {
+    position: relative;
 }
 
-contactsTriggers.forEach(trigger => {
-    trigger.addEventListener('mouseenter', (e) => {
-        clearTimeout(contactsTimer);
-        contactsTriggerElement = e.currentTarget;
-        updateContactsPopupPosition();
-        contactsPopup.classList.add('show');
-    });
-
-    trigger.addEventListener('mouseleave', () => {
-        contactsTimer = setTimeout(() => {
-            contactsPopup.classList.remove('show');
-        }, 300);
-    });
-});
-
-// Обновляем позицию попапа при скролле
-window.addEventListener('scroll', updateContactsPopupPosition);
-
-// Закрытие попапа при клике вне его
-contactsPopup.addEventListener('mouseenter', () => {
-    clearTimeout(contactsTimer);
-});
-
-contactsPopup.addEventListener('mouseleave', () => {
-    contactsTimer = setTimeout(() => {
-        contactsPopup.classList.remove('show');
-    }, 300);
-});
-
-// Плавная прокрутка для навигации
-const navLinks = document.querySelectorAll('.nav-link');
-
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href');
-        const targetSection = document.querySelector(targetId);
-        
-        if (targetSection) {
-            // Закрываем шторку если открыта
-            if (sidebar.classList.contains('active')) {
-                toggleSidebar();
-            }
-            
-            // Плавная прокрутка
-            targetSection.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-// Обработчик для логотипа (возврат на главную)
-const logo = document.querySelector('.logo');
-logo.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector('#home').scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-    });
-});
-
-// Фильтр по цене
-const priceFilterTrigger = document.getElementById('priceFilterTrigger');
-const priceFilterDropdown = document.getElementById('priceFilterDropdown');
-const minPriceInput = document.getElementById('minPrice');
-const maxPriceInput = document.getElementById('maxPrice');
-const applyFiltersBtn = document.getElementById('applyFilters');
-const resetFiltersBtn = document.getElementById('resetFilters');
-const categoryFilter = document.getElementById('categoryFilter');
-const ratingFilter = document.getElementById('ratingFilter');
-
-// Открытие/закрытие фильтра по цене
-priceFilterTrigger.addEventListener('click', (e) => {
-    e.stopPropagation();
-    priceFilterDropdown.classList.toggle('show');
-    priceFilterTrigger.classList.toggle('active');
-});
-
-// Закрытие фильтра по цене при клике вне его
-document.addEventListener('click', (e) => {
-    if (!priceFilterTrigger.contains(e.target) && !priceFilterDropdown.contains(e.target)) {
-        priceFilterDropdown.classList.remove('show');
-        priceFilterTrigger.classList.remove('active');
-    }
-});
-
-// Валидация ввода цены
-[minPriceInput, maxPriceInput].forEach(input => {
-    input.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/[^\d]/g, '');
-        if (value > 100000) value = 100000;
-        e.target.value = value;
-        
-        // Обновление плейсхолдера
-        updatePricePlaceholder();
-    });
-});
-
-function updatePricePlaceholder() {
-    const min = minPriceInput.value || '0';
-    const max = maxPriceInput.value || '100000';
-    priceFilterTrigger.querySelector('.price-placeholder').textContent = `${min} - ${max} руб`;
+.theme-checkbox {
+    display: none;
 }
 
-// Отображение товаров
-function renderProducts(productsToRender) {
-    const productsGrid = document.getElementById('productsGrid');
-    productsGrid.innerHTML = '';
-
-    if (productsToRender.length === 0) {
-        productsGrid.innerHTML = '<div class="no-products">Товары не найдены</div>';
-        return;
-    }
-
-    productsToRender.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.innerHTML = `
-            <div class="product-image">
-                ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
-            </div>
-            <div class="product-info">
-                <h3 class="product-title">${product.name}</h3>
-                <p class="product-desc">${product.description}</p>
-                <div class="product-price">${product.price.toLocaleString()} ₽</div>
-                <button class="add-to-cart" data-id="${product.id}">В корзину</button>
-            </div>
-        `;
-        productsGrid.appendChild(productCard);
-    });
-
-    // Добавляем обработчики для кнопок "В корзину"
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const productId = parseInt(e.target.dataset.id);
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                addToCart(product);
-            }
-        });
-    });
+.theme-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 70px;
+    height: 35px;
+    background: var(--gray);
+    border-radius: 50px;
+    padding: 5px;
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition);
 }
 
-// Фильтрация товаров
-function filterProducts() {
-    const category = categoryFilter.value;
-    const rating = ratingFilter.value;
-    const minPrice = parseInt(minPriceInput.value) || 0;
-    const maxPrice = parseInt(maxPriceInput.value) || 100000;
-
-    const filteredProducts = products.filter(product => {
-        // Фильтр по категории
-        if (category !== 'all' && product.category !== category) {
-            return false;
-        }
-
-        // Фильтр по рейтингу
-        if (rating !== 'all' && product.rating < parseInt(rating)) {
-            return false;
-        }
-
-        // Фильтр по цене
-        if (product.price < minPrice || product.price > maxPrice) {
-            return false;
-        }
-
-        return true;
-    });
-
-    renderProducts(filteredProducts);
+.theme-slider {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background: var(--bg-white);
+    border-radius: 50%;
+    transition: var(--transition);
+    left: 5px;
+    box-shadow: var(--shadow);
 }
 
-// Сброс фильтров
-function resetFilters() {
-    categoryFilter.value = 'all';
-    ratingFilter.value = 'all';
-    minPriceInput.value = '';
-    maxPriceInput.value = '';
-    priceFilterTrigger.querySelector('.price-placeholder').textContent = 'Выберите диапазон';
-    priceFilterDropdown.classList.remove('show');
-    priceFilterTrigger.classList.remove('active');
-    
-    renderProducts(products);
+.theme-checkbox:checked + .theme-label .theme-slider {
+    transform: translateX(35px);
 }
 
-// Инициализация
-applyFiltersBtn.addEventListener('click', filterProducts);
-resetFiltersBtn.addEventListener('click', resetFilters);
+.theme-label .sun,
+.theme-label .moon {
+    font-size: 14px;
+    transition: var(--transition);
+    z-index: 1;
+}
 
-// Закрытие dropdown при ресайзе (для мобильных)
-window.addEventListener('resize', () => {
-    priceFilterDropdown.classList.remove('show');
-    priceFilterTrigger.classList.remove('active');
-});
+.theme-label .sun {
+    opacity: 1;
+}
 
-// Инициализация товаров при загрузке
-document.addEventListener('DOMContentLoaded', () => {
-    renderProducts(products);
-    updateCart();
-});
+.theme-label .moon {
+    opacity: 0.5;
+}
 
-// Стили для уведомления корзины
-const cartNotificationStyles = `
-.cart-notification {
+.theme-checkbox:checked + .theme-label .sun {
+    opacity: 0.5;
+}
+
+.theme-checkbox:checked + .theme-label .moon {
+    opacity: 1;
+}
+
+.mobile-theme {
+    display: none;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+/* Шапка */
+header {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
     position: fixed;
-    top: 100px;
-    right: 20px;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.logo {
+    text-decoration: none;
+}
+
+.logo h1 {
+    color: var(--primary);
+    font-size: 1.8rem;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.logo:hover h1 {
+    color: var(--primary-dark);
+}
+
+.main-nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    transition: var(--transition);
+    position: relative;
+}
+
+.main-nav a:hover {
+    color: var(--primary);
+}
+
+/* Кнопка корзины */
+.cart-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    position: relative;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cart-icon {
+    font-size: 1.5rem;
+    transition: var(--transition);
+}
+
+.cart-count {
+    background: var(--accent);
+    color: var(--bg-white);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.cart-btn:hover .cart-icon {
+    transform: scale(1.1);
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-left: 1rem;
+}
+
+.menu-btn span {
+    width: 25px;
+    height: 3px;
+    background: var(--text-dark);
+    transition: var(--transition);
+}
+
+.menu-btn:hover span {
+    background: var(--primary);
+}
+
+/* Header actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Корзина */
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 350px;
+    height: 100%;
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    z-index: 2000;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.cart-sidebar.active {
+    right: 0;
+}
+
+.cart-content h3 {
+    margin-bottom: 2rem;
+    color: var(--text-dark);
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.cart-items {
+    margin-bottom: 2rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray);
+    gap: 1rem;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+}
+
+.cart-item-price {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.cart-item-remove {
+    background: var(--accent);
+    color: var(--bg-white);
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: var(--transition);
+}
+
+.cart-item-remove:hover {
+    background: #c0392b;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: 2px solid var(--primary);
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 1rem;
     background: var(--primary);
     color: var(--bg-white);
-    padding: 1rem 1.5rem;
+    border: none;
     border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1.1rem;
+}
+
+.checkout-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.empty-cart {
+    text-align: center;
+    color: var(--text-light);
+    padding: 2rem;
+}
+
+/* Всплывающее окно контактов */
+.contacts-popup {
+    position: fixed;
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem;
+    border-radius: 12px;
     box-shadow: var(--shadow);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2000;
+    min-width: 250px;
+    text-align: center;
+    border: 2px solid var(--primary);
+    transform: translateY(-10px);
+}
+
+.contacts-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.popup-content h4 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.popup-content p {
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+/* Слайдер */
+.slider-section {
+    margin-top: 80px;
+    position: relative;
+}
+
+.slider-container {
+    position: relative;
+    height: 500px;
+    overflow: hidden;
+}
+
+.slider {
+    position: relative;
+    height: 100%;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.slide:nth-child(1) {
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('fonimg.jpg');
+}
+
+.slide:nth-child(2) {
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('fonimg.jpg');
+}
+
+.slide:nth-child(3) {
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('fonimg.jpg');
+}
+
+.slide-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--bg-white);
+}
+
+.slide-content h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.slide-content p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.slider-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dot.active {
+    background: var(--bg-white);
+    transform: scale(1.2);
+}
+
+/* Фильтры */
+.filters-section {
+    padding: 3rem 0;
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.filters-header h2 {
+    color: var(--text-dark);
+    font-size: 1.8rem;
+}
+
+.reset-filters {
+    padding: 0.5rem 1rem;
+    background: var(--accent);
+    color: var(--bg-white);
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.reset-filters:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+.filters {
+    display: flex;
+    gap: 2rem;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+}
+
+.filter-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray);
+    border-radius: 8px;
+    background: var(--bg-white);
+    color: var(--text-dark);
+    font-size: 1rem;
+    transition: var(--transition);
+    min-width: 200px;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Фильтр по цене */
+.price-filter-group {
+    position: relative;
+}
+
+.price-filter-trigger {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray);
+    border-radius: 8px;
+    background: var(--bg-white);
+    color: var(--text-dark);
+    font-size: 1rem;
+    transition: var(--transition);
+    min-width: 200px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-filter-trigger:hover {
+    border-color: var(--primary);
+}
+
+.price-filter-trigger.active {
+    border-color: var(--primary);
+}
+
+.price-filter-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-white);
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 5px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: var(--transition);
+    z-index: 100;
+}
+
+.price-filter-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.price-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.price-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.price-input-group label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.price-input {
+    padding: 0.5rem;
+    border: 1px solid var(--gray);
+    border-radius: 4px;
+    background: var(--bg-white);
+    color: var(--text-dark);
+    font-size: 0.9rem;
+}
+
+.price-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.filter-btn {
+    padding: 0.75rem 2rem;
+    background: var(--primary);
+    color: var(--bg-white);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    height: fit-content;
+}
+
+.filter-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Товары */
+.products-section {
+    padding: 3rem 0;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.product-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+    position: relative;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.05);
+}
+
+.product-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--accent);
+    color: var(--bg-white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.product-info {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    line-height: 1.3;
+}
+
+.product-desc {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.add-to-cart {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary);
+    color: var(--bg-white);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: auto;
+}
+
+.add-to-cart:hover {
+    background: var(--primary-dark);
+}
+
+/* Преимущества */
+.advantages-section {
+    padding: 5rem 0;
+    background: var(--bg-card);
+    transition: var(--transition);
+}
+
+.advantages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.advantage-card {
+    background: var(--bg-white);
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
+    text-align: center;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    box-shadow: var(--shadow);
+}
+
+.advantage-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.1);
+}
+
+.advantage-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.advantage-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.advantage-card p {
+    color: var(--text-light);
+    line-height: 1.7;
+}
+
+/* Контакты */
+.contacts-section {
+    padding: 5rem 0;
+    background: var(--bg-light);
+}
+
+.contacts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.contact-card {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    box-shadow: var(--shadow);
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.contact-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.contact-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.contact-card p {
+    font-size: 1.1rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.contact-card span {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Шторка */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 350px;
+    height: 100%;
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    z-index: 2000;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.close-btn:hover {
+    color: var(--primary);
+}
+
+.sidebar-content h3 {
+    margin-bottom: 2rem;
+    color: var(--text-dark);
+    font-size: 1.5rem;
+}
+
+.mobile-nav {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.mobile-nav a {
+    text-decoration: none;
+    color: var(--text-dark);
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: var(--transition);
+    text-align: center;
     font-weight: 500;
 }
 
-.cart-notification.show {
-    transform: translateX(0);
+.mobile-nav a:hover {
+    background: var(--primary-light);
+    color: var(--primary);
 }
-`;
 
-const styleSheet = document.createElement('style');
-styleSheet.textContent = cartNotificationStyles;
-document.head.appendChild(styleSheet);
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.auth-form input {
+    padding: 0.75rem;
+    border: 2px solid var(--gray);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+    background: var(--bg-white);
+    color: var(--text-dark);
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.auth-btn {
+    padding: 0.75rem;
+    background: var(--primary);
+    color: var(--bg-white);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.auth-btn:hover {
+    background: var(--primary-dark);
+}
+
+.auth-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.auth-links a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: var(--transition);
+    text-align: center;
+}
+
+.auth-links a:hover {
+    color: var(--primary-dark);
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    z-index: 1500;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Подвал */
+footer {
+    background: var(--text-dark);
+    color: var(--bg-white);
+    padding: 2rem 0;
+    text-align: center;
+    transition: var(--transition);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .main-nav {
+        display: none;
+    }
+
+    .mobile-nav {
+        display: flex;
+    }
+
+    .mobile-theme {
+        display: flex;
+    }
+
+    .filters-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .reset-filters {
+        align-self: center;
+        max-width: 200px;
+    }
+
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+    }
+
+    .filter-select {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .price-filter-trigger {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .price-filter-dropdown {
+        width: 100%;
+    }
+
+    .filter-btn {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .advantages-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .advantage-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .contacts-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .slider-container {
+        height: 400px;
+    }
+
+    .slide-content h2 {
+        font-size: 2rem;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .sidebar, .cart-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+
+    .header-actions {
+        gap: 0.5rem;
+    }
+
+    .header-inner {
+        padding: 0.75rem 0;
+    }
+
+    .logo h1 {
+        font-size: 1.5rem;
+    }
+
+    .cart-btn {
+        padding: 0.25rem;
+    }
+
+    .cart-icon {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .slide-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .slide-content p {
+        font-size: 1rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .sidebar, .cart-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+
+    .contacts-popup {
+        min-width: 200px;
+        padding: 1rem;
+    }
+
+    .advantages-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .cart-sidebar {
+        padding: 1rem;
+    }
+}
